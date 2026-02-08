@@ -7,104 +7,134 @@
 
 <style>
 :root{
-  --bg:#f2f2f7;
+  --bg1:#f2f2f7;
+  --bg2:#e5e5ea;
   --text:#000;
+  --sub:#8e8e93;
   --card:#ffffff;
-  --blur:blur(20px);
+  --blur:blur(22px);
 }
 body.dark{
-  --bg:#000;
+  --bg1:#000;
+  --bg2:#1c1c1e;
   --text:#fff;
-  --card:rgba(28,28,30,.9);
+  --sub:#9a9a9d;
+  --card:rgba(28,28,30,.92);
 }
 
 *{box-sizing:border-box}
 body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"San Francisco";
-  background:var(--bg);
   color:var(--text);
-  transition:.3s;
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  min-height:100vh;
+  transition:.4s ease;
 }
 
+/* HEADER */
 header{
-  padding:25px 20px 10px;
+  padding:28px 20px 18px;
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
 }
 
-h1{margin:0;font-size:32px}
-.subtitle{color:#8e8e93}
-
-.icon-btn{
-  background:none;
-  border:none;
-  font-size:24px;
+.app-title{position:relative}
+.app-title::after{
+  content:"";
+  position:absolute;
+  bottom:-6px;
+  left:0;
+  width:36px;
+  height:4px;
+  border-radius:4px;
+  background:linear-gradient(90deg,#0a84ff,#64d2ff);
 }
 
-.cards{padding-bottom:90px}
+h1{margin:0;font-size:34px;font-weight:700}
+.subtitle{margin-top:6px;color:var(--sub);font-size:15px}
+
+/* ICON */
+.icon-btn{
+  background:var(--card);
+  border:none;
+  width:44px;height:44px;
+  border-radius:14px;
+  font-size:22px;
+  backdrop-filter:var(--blur);
+  box-shadow:0 8px 20px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.35);
+}
+.icon-btn:active{transform:scale(.94)}
+
+/* CARDS */
+.cards{padding-bottom:30px}
 
 .card{
-  margin:20px;
-  padding:20px;
-  border-radius:22px;
+  margin:22px;
+  padding:26px 22px 24px;
+  border-radius:26px;
   background:linear-gradient(135deg,#0bbf6a,#1fd286);
   color:white;
-  box-shadow:0 15px 35px rgba(0,0,0,.25);
+  box-shadow:0 25px 45px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.25);
   animation:up .5s ease;
 }
 
-.card img{height:28px}
+.card-logo{
+  display:block;
+  margin:0 auto 18px;
+  height:54px;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.35));
+}
 
 .card-num{
   font-size:20px;
   letter-spacing:3px;
-  margin:18px 0;
+  margin-bottom:14px;
 }
 
-.bottom-bar{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  background:var(--card);
-  backdrop-filter:var(--blur);
+/* ACTIONS */
+.actions{
   display:flex;
-  justify-content:space-around;
-  padding:14px 0;
+  gap:16px;
+  padding:10px 22px 30px;
 }
-
-.bottom-bar button{
+.action-btn{
+  flex:1;
+  padding:16px 0;
   border:none;
-  border-radius:14px;
-  padding:12px 18px;
-  background:#0a84ff;
-  color:white;
-  font-size:14px;
+  border-radius:18px;
+  font-weight:600;
+  background:linear-gradient(180deg,#fff,#e5e5ea);
+  box-shadow:0 10px 20px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.9);
+}
+body.dark .action-btn{
+  background:linear-gradient(180deg,#2c2c2e,#1c1c1e);
+  color:#fff;
 }
 
+/* MODALS */
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.4);
+  background:rgba(0,0,0,.45);
   display:none;
   align-items:center;
   justify-content:center;
 }
-
 .modal-box{
   background:var(--card);
   backdrop-filter:var(--blur);
   width:90%;
-  border-radius:22px;
-  padding:20px;
+  border-radius:26px;
+  padding:22px;
 }
 
 input,select{
   width:100%;
-  padding:10px;
-  margin-top:10px;
-  border-radius:12px;
+  padding:12px;
+  margin-top:12px;
+  border-radius:14px;
   border:none;
 }
 
@@ -116,81 +146,83 @@ input,select{
 </head>
 
 <body>
+
 <header>
-  <div>
+  <div class="app-title">
     <h1>CM Card</h1>
     <div class="subtitle">Gracias por elegirnos</div>
   </div>
-  <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+  <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
 </header>
 
 <div class="cards" id="cards"></div>
 
-<div class="bottom-bar">
-  <button onclick="openAdd()">➕ Agregar</button>
-  <button onclick="openSettings()">⚙️ Ajustes</button>
+<div class="actions">
+  <button class="action-btn" onclick="openAdd()">➕ Agregar</button>
+  <button class="action-btn" onclick="openSettings()">⚙️ Ajustes</button>
 </div>
 
-<!-- AGREGAR -->
+<!-- ADD CARD MODAL -->
 <div class="modal" id="addModal">
   <div class="modal-box">
-    <h3>Nueva tarjeta</h3>
     <input id="name" placeholder="Nombre">
-    <input id="number" maxlength="16" placeholder="Número de tarjeta (16)">
-    <input id="date" placeholder="Vencimiento (YY/MM)">
-    <select id="currency">
-      <option>USD</option>
-      <option>CUP</option>
-      <option>MLC</option>
-    </select>
-    <select id="phone">
-      <option>🇨🇺 +53 Cuba</option>
-      <option>🇺🇸 +1 USA</option>
-      <option>🇪🇸 +34 España</option>
-    </select>
-    <br><br>
-    <button onclick="saveCard()">Guardar</button>
-    <button onclick="closeAll()">Cerrar</button>
+    <input id="number" placeholder="Número de tarjeta" maxlength="16" inputmode="numeric">
+    <input id="date" placeholder="YY/MM" maxlength="5" inputmode="numeric">
+    <button class="action-btn" onclick="saveCard()">Guardar</button>
+    <button class="action-btn" onclick="closeAll()">Cancelar</button>
   </div>
 </div>
 
-<!-- AJUSTES -->
+<!-- SETTINGS -->
 <div class="modal" id="settingsModal">
   <div class="modal-box">
-    <h3>Ajustes</h3>
-    <p>CM Company</p>
-    <button onclick="toggleTheme()">🌙 / ☀️</button>
-    <br><br>
-    <button onclick="closeAll()">Cerrar</button>
+    <strong>CM Company</strong><br><br>
+    <button class="action-btn" onclick="toggleTheme()">Cambiar modo</button>
+    <button class="action-btn" onclick="closeAll()">Cerrar</button>
   </div>
 </div>
 
 <script>
+const cardsEl=document.getElementById("cards");
+const btn=document.getElementById("themeBtn");
+
 function toggleTheme(){
   document.body.classList.toggle("dark");
+  btn.textContent=document.body.classList.contains("dark")?"☀️":"🌙";
 }
-function openAdd(){
-  document.getElementById("addModal").style.display="flex";
+
+function openAdd(){addModal.style.display="flex"}
+function openSettings(){settingsModal.style.display="flex"}
+function closeAll(){document.querySelectorAll(".modal").forEach(m=>m.style.display="none")}
+
+/* FORMATO FECHA YY/MM */
+date.addEventListener("input",()=>{
+  let v=date.value.replace(/\D/g,"").slice(0,4);
+  if(v.length>2) v=v.slice(0,2)+"/"+v.slice(2);
+  date.value=v;
+});
+
+/* STORAGE */
+function saveToStorage(){
+  localStorage.setItem("cmcards",cardsEl.innerHTML);
 }
-function openSettings(){
-  document.getElementById("settingsModal").style.display="flex";
+function loadFromStorage(){
+  const data=localStorage.getItem("cmcards");
+  if(data) cardsEl.innerHTML=data;
 }
-function closeAll(){
-  document.querySelectorAll(".modal").forEach(m=>m.style.display="none");
-}
+loadFromStorage();
+
 function saveCard(){
-  const n=name.value;
-  const num=number.value;
-  const d=date.value;
   const card=document.createElement("div");
   card.className="card";
   card.innerHTML=`
-    <img src="logo.PNG">
-    <div class="card-num">${num.replace(/(.{4})/g,"$1 ")}</div>
-    <div>${n}</div>
-    <div>Vence ${d}</div>`;
-  card.onclick=()=>confirm("¿Eliminar tarjeta?")&&card.remove();
-  cards.appendChild(card);
+    <img src="logo.PNG" class="card-logo">
+    <div class="card-num">${number.value.replace(/(.{4})/g,"$1 ")}</div>
+    <div>${name.value}</div>
+    <div>Vence ${date.value}</div>`;
+  card.onclick=()=>confirm("¿Eliminar tarjeta?")&&(card.remove(),saveToStorage());
+  cardsEl.appendChild(card);
+  saveToStorage();
   closeAll();
 }
 </script>
